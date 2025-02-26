@@ -20,8 +20,10 @@ let changingDirection = false;
 let highScore = localStorage.getItem('high-score') || 0;
 
 const changeApplePosition = () => {
-    appleX = Math.floor(Math.random() * 30) + 1;
-    appleY = Math.floor(Math.random() * 30) + 1;
+    do {
+        appleX = Math.floor(Math.random() * 30) + 1;
+        appleY = Math.floor(Math.random() * 30) + 1;
+    } while (body.some(segment => segment[0] === appleX && segment[1] === appleY));
 }
 
 const handleGameOver = () => {
