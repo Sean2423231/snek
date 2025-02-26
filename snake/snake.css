@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swa');
+
+.wrapper {
+    width: 65vmin;
+    height: 70vmin;
+    display:flex;
+    overflow: hidden;
+    flex-direction: column;
+    border-radius: 5px;
+    background: 5px;
+    background-color: #8bac0f
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #A0A0A0;
+    overflow: hidden
+}
+
+.game-details {
+    font-family: "Press Start 2P", serif;
+    font-size: 2vmin;
+    font-weight: 500;
+    padding: 20px 27px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color:	#0f380f;
+}
+
+.play-board {
+    width: 100%;
+    height: 100%;
+    background-color: 	#9bbc0f;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    display:grid;
+    grid-template: repeat(30, 1fr) / repeat(30, 1fr);
+    position: relative;
+}
+.play-board .apple {
+    background: #306230;
+    width: 75%;
+    height: 75%;
+    justify-self: center;
+    align-self: center;
+}
+.play-board .head {
+    background: #0f380f;
+    width: 100%;
+    height: 100%;
+}
+.footer {
+    font-family: "Press Start 2P", serif;
+    font-size: 1.2vmin;
+    position: fixed;
+    bottom: 0;
+    background: #272929;
+    text-align: center;
+    padding: 1vmin;
+    color:	#9a2257;
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+}
