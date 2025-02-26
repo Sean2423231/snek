@@ -4,7 +4,6 @@ const highScoreElement = document.querySelector('.high-score');
 
 let score = 0;
 let gameOver = false;
-let appleX, appleY;
 let headX = 5, headY = 10;
 let velocityX = 0, velocityY = 0;
 let body = [
@@ -12,22 +11,43 @@ let body = [
     [headX - 1, headY],
     [headX - 2, headY]
 ];
+
+class applePosition {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+// Use an array to hold multiple apples.
+let apples = [];
+
+// Generate a new apple ensuring its position does not overlap the snake.
+const generateApple = () => {
+    let newApple;
+    do {
+        newApple = new applePosition(
+            Math.floor(Math.random() * 30) + 1,
+            Math.floor(Math.random() * 30) + 1
+        );
+    } while (body.some(segment => segment[0] === newApple.x && segment[1] === newApple.y));
+    apples.push(newApple);
+};
+
+ // Initially create one apple (or call generateApple multiple times for more).
+generateApple();
+
 let setIntervalId;
 // Flag to ensure one direction input per cycle
 let changingDirection = false;
 
-//high score from local storage (or 0 if not set)
+// High score stored from local storage (or 0 if not set)
 let highScore = localStorage.getItem('high-score') || 0;
 
-const changeApplePosition = () => {
-    do {
-        appleX = Math.floor(Math.random() * 30) + 1;
-        appleY = Math.floor(Math.random() * 30) + 1;
-    } while (body.some(segment => segment[0] === appleX && segment[1] === appleY));
-}
+// Set the score threshold for apple addition.
+let nextAppleThreshold = 15;
 
 const handleGameOver = () => {
-    // clear the interval and display a game over screen
     clearInterval(setIntervalId);
     gameOver = true;
     playBoard.innerHTML = `
@@ -37,13 +57,12 @@ const handleGameOver = () => {
             <p>Press any key to restart</p>
         </div>
     `;
-    // Listen for a key press to restart the game (once)
     document.addEventListener('keydown', restartGame, {once: true});
-}
+};
 
 const restartGame = () => {
     location.reload();
-}
+};
 
 const changeDirection = (e) => {
     if (changingDirection) return;
@@ -62,7 +81,30 @@ const changeDirection = (e) => {
         velocityX = 1;
         velocityY = 0;
     }
-}
+};
+
+const checkAppleCollision = () => {
+    let collided = false;
+    for (let i = 0; i < apples.length; i++) {
+        if (headX === apples[i].x && headY === apples[i].y) {
+            // Remove the collided apple.
+            apples.splice(i, 1);
+            collided = true;
+            score++;
+            highScore = score >= highScore ? score : highScore;
+            localStorage.setItem('high-score', highScore);
+            scoreElement.innerText = `Score: ${score}`;
+            highScoreElement.innerText = `High Score: ${highScore}`;
+            // Generate a new apple immediately after collision.
+            generateApple();
+            break;
+        }
+    }
+    // If no collision occurred, remove the tail (snake is not growing).
+    if (!collided) {
+        body.pop();
+    }
+};
 
 const initGame = () => {
     if (gameOver) {
@@ -72,27 +114,12 @@ const initGame = () => {
     headX += velocityX;
     headY += velocityY;
 
-    // Game over if head goes out of bounds
+    // Game over if head goes out of bounds.
     if (headX <= 0 || headX > 30 || headY <= 0 || headY > 30) {
         return handleGameOver();
     }
     
-    // If the snake eats the apple, change its position.
-    // Otherwise, remove the tail segment (to keep the snake size constant).
-    if (headX === appleX && headY === appleY) {
-        changeApplePosition();
-        score++;
-        highScore = score >= highScore ? score : highScore;
-        localStorage.setItem('high-score', highScore);
-
-        scoreElement.innerText = `Score: ${score}`;
-        highScoreElement.innerText = `High Score: ${highScore}`;
-        if (score < 250)
-            clearInterval(setIntervalId);
-        setIntervalId = setInterval(initGame, 125 - score/2);
-    } else {
-        body.pop();
-    }
+    checkAppleCollision();
     
     // Add the new head position at the beginning of the snake body.
     body.unshift([headX, headY]);
@@ -104,7 +131,17 @@ const initGame = () => {
         }
     }
     
-    let htmlMarkup = `<div class="apple" style="grid-area: ${appleY} / ${appleX}"></div>`;
+    // If score reaches or exceeds the threshold, add an apple and update the threshold.
+    if (score >= nextAppleThreshold) {
+        generateApple();
+        nextAppleThreshold += 15+Math.round(score/2);
+    }
+    
+    // Build the HTML markup: render apples first, then snake segments.
+    let htmlMarkup = '';
+    apples.forEach(apple => {
+        htmlMarkup += `<div class="apple" style="grid-area: ${apple.y} / ${apple.x}"></div>`;
+    });
     body.forEach(segment => {
         htmlMarkup += `<div class="head" style="grid-area: ${segment[1]} / ${segment[0]}"></div>`;
     });
@@ -113,30 +150,26 @@ const initGame = () => {
     
     // Reset the flag at the end of the cycle to allow a new input.
     changingDirection = false;
-}
+};
 
-//start of code
 if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
 }
 highScoreElement.innerText = `High Score: ${highScore}`;
-changeApplePosition();
 
-// Display the start message "Snek" until a key is pressed
+// Initially display the start message "Snek" until a key is pressed.
 playBoard.innerHTML = `<div class="start-message">Snek</div>`;
 
-// Game remains paused until the first key press.
 let gameStarted = false;
 document.addEventListener('keydown', (e) => {
-    // Start game only on the first key press.
     if (!gameStarted) {
         gameStarted = true;
-        // Remove the start message
+        // Remove the start message.
         const startMessage = document.querySelector('.start-message');
         if (startMessage) {
             startMessage.remove();
         }
-        // Set an initial movement
+        // Set an initial movement.
         velocityX = 1;
         velocityY = 0;
         setIntervalId = setInterval(initGame, 125);
