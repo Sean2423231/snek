@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swa');
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Press+Start+2P&display=swap');
 
 .wrapper {
     width: 65vmin;
@@ -8,7 +8,15 @@
     flex-direction: column;
     border-radius: 5px;
     background: 5px;
-    background-color: #8bac0f
+    background-color: #8bac0f;
+    border-left: 9vmin solid 	#32353f;
+    border-right: 9vmin solid 	#32353f;
+    border-bottom: 4.5vmin solid 	#32353f;
+    border-top: 4.5vmin solid 	#32353f;
+    border-bottom-right-radius: 9vmin;
+    border-top-left-radius: 2vmin;
+    border-top-right-radius: 2vmin;
+    border-bottom-left-radius: 2vmin;
 }
 
 body {
@@ -24,7 +32,7 @@ body {
     font-family: "Press Start 2P", serif;
     font-size: 2vmin;
     font-weight: 500;
-    padding: 20px 27px;
+    padding: 2% 3%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -63,6 +71,41 @@ body {
     text-align: center;
     padding: 1vmin;
     color:	#9a2257;
-    border-top-left-radius:10px;
-    border-top-right-radius:10px;
+    border-top-left-radius:1.2vmin;
+    border-top-right-radius:1.2vmin;
+}
+.start-message {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Pixelify Sans", serif;
+    font-size: 17vmin;
+    color: #0f380f;
+}
+.game-over-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #9bbc0f;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: "Press Start 2P", serif;
+    color: #0f380f;
+    text-align: center;
+}
+.game-over-screen h2 {
+    font-size: 6vmin;
+    margin-bottom: 1vmin;
+}
+.game-over-screen p {
+    font-size: 2vmin;
 }

@@ -7,13 +7,16 @@ let gameOver = false;
 let appleX, appleY;
 let headX = 5, headY = 10;
 let velocityX = 0, velocityY = 0;
-let body = [];
+let body = [
+    [headX, headY],
+    [headX - 1, headY],
+    [headX - 2, headY]
+];
 let setIntervalId;
 // Flag to ensure one direction input per cycle
 let changingDirection = false;
 
-//high score
-//if there is no high score in local storage, set it to 0
+//high score from local storage (or 0 if not set)
 let highScore = localStorage.getItem('high-score') || 0;
 
 const changeApplePosition = () => {
@@ -22,9 +25,21 @@ const changeApplePosition = () => {
 }
 
 const handleGameOver = () => {
-    //clears timer and reloads the page
+    // clear the interval and display a game over screen
     clearInterval(setIntervalId);
-    alert('Game Over! Press ok to try again');
+    gameOver = true;
+    playBoard.innerHTML = `
+        <div class="game-over-screen">
+            <h2>Game Over!</h2>
+            <p>Score: ${score}</p>
+            <p>Press any key to restart</p>
+        </div>
+    `;
+    // Listen for a key press to restart the game (once)
+    document.addEventListener('keydown', restartGame, {once: true});
+}
+
+const restartGame = () => {
     location.reload();
 }
 
@@ -49,14 +64,14 @@ const changeDirection = (e) => {
 
 const initGame = () => {
     if (gameOver) {
-        return handleGameOver();
+        return;
     }
+    
     headX += velocityX;
     headY += velocityY;
 
     // Game over if head goes out of bounds
     if (headX <= 0 || headX > 30 || headY <= 0 || headY > 30) {
-        gameOver = true;
         return handleGameOver();
     }
     
@@ -70,8 +85,8 @@ const initGame = () => {
 
         scoreElement.innerText = `Score: ${score}`;
         highScoreElement.innerText = `High Score: ${highScore}`;
-        if(score< 250)
-        clearInterval(setIntervalId);
+        if (score < 250)
+            clearInterval(setIntervalId);
         setIntervalId = setInterval(initGame, 125 - score/2);
     } else {
         body.pop();
@@ -83,7 +98,6 @@ const initGame = () => {
     // Check for self-collision.
     for (let i = 1; i < body.length; i++) {
         if (body[0][0] === body[i][0] && body[0][1] === body[i][1]) {
-            gameOver = true;
             return handleGameOver();
         }
     }
@@ -100,9 +114,30 @@ const initGame = () => {
 }
 
 //start of code
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
 highScoreElement.innerText = `High Score: ${highScore}`;
 changeApplePosition();
-setIntervalId = setInterval(initGame, 125);
 
-//event listener for keydown
-document.addEventListener('keydown', changeDirection);
+// Display the start message "Snek" until a key is pressed
+playBoard.innerHTML = `<div class="start-message">Snek</div>`;
+
+// Game remains paused until the first key press.
+let gameStarted = false;
+document.addEventListener('keydown', (e) => {
+    // Start game only on the first key press.
+    if (!gameStarted) {
+        gameStarted = true;
+        // Remove the start message
+        const startMessage = document.querySelector('.start-message');
+        if (startMessage) {
+            startMessage.remove();
+        }
+        // Set an initial movement
+        velocityX = 1;
+        velocityY = 0;
+        setIntervalId = setInterval(initGame, 125);
+    }
+    changeDirection(e);
+});
